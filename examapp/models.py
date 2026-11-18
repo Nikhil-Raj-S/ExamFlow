@@ -35,6 +35,8 @@ class Test(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    start_time = models.DateTimeField(null=True,blank=True)
+
     duration_minutes = models.PositiveIntegerField(validators = [
         MinValueValidator(1), MaxValueValidator(120) ])
 
@@ -63,13 +65,13 @@ class Question(models.Model):
 
     question_text = models.TextField()
 
-    option_a = models.TextField()
+    option_a = models.CharField()
 
-    option_b = models.TextField()
+    option_b = models.CharField()
 
-    option_c = models.TextField()
+    option_c = models.CharField()
 
-    option_d = models.TextField()
+    option_d = models.CharField()
 
     correct_option = models.CharField(
     max_length = 1,
