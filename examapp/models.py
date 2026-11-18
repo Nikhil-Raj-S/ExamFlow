@@ -95,6 +95,8 @@ class TestAttempt(models.Model):
         on_delete = models.CASCADE,
     )
 
+    marks_obtained = models.PositiveIntegerField(default=0)
+
     attempt_no = models.PositiveIntegerField()
 
     started_at = models.DateTimeField(auto_now_add=True)
