@@ -19,3 +19,19 @@ def student_profile(request):
     }
 
     return render(request, 'student_profile.html', context)
+
+from django.shortcuts import render
+from ..decorators import teacher_required
+
+
+@teacher_required
+def teacher_profile(request):
+
+    profile = request.user.profile
+
+    context = {
+        'user': request.user,
+        'profile': profile,
+    }
+
+    return render(request, 'teacher_profile.html', context)
