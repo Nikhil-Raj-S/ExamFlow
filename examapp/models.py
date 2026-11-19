@@ -115,6 +115,11 @@ class TestAttempt(models.Model):
                 fields = ['student', 'test', 'attempt_no'],
                 name = 'unique_student_test_and_attempt_no',
         ),
+        models.UniqueConstraint(
+            fields=['student', 'test'],
+            condition=models.Q(status='in_progress'),
+            name='unique_active_attempt_per_student_test',
+        ),
         ]
 
 
