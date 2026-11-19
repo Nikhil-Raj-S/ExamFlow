@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<header class="page-head"><div><h1>Hello, {{ user.first_name|default:user.username }}</h1><p class="sub">Here is where your tests stand.</p></div></header>
+
+<section class="stats">
+  <a class="stat" href="{% url 'AvailableTests' %}"><span class="stat-n">{{ available }}</span><span class="stat-l">Available</span></a>
+  <a class="stat" href="{% url 'InProgressTests' %}"><span class="stat-n">{{ in_progress }}</span><span class="stat-l">In progress</span></a>
+  <a class="stat" href="{% url 'CompletedTests' %}"><span class="stat-n">{{ completed }}</span><span class="stat-l">Completed</span></a>
+  <div class="stat"><span class="stat-n">{{ average_score }}%</span><span class="stat-l">Average score</span></div>
+</section>
+
+<div class="two-col">
+  <section class="card wide">
+    <div class="card-head"><h2>Open for you</h2><a href="{% url 'AvailableTests' %}">View all</a></div>
+    {% for test in recent_available_tests %}
+    <a class="row" href="{% url 'TestDetail' test.id %}">
+      <div><strong>{{ test.title }}</strong>
+        <div class="meta"><span>{{ test.subject }}</span><span>{{ test.duration_minutes }} min</span><span>Closes {{ test.last_date_for_submission|date:"d M Y" }}</span></div></div>
+      <span class="badge">Open</span>
+    </a>
+    {% empty %}<p class="empty">No tests are open right now.</p>{% endfor %}
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2>Continue</h2><a href="{% url 'InProgressTests' %}">View all</a></div>
+    {% for a in recent_in_progress %}
+    <a class="row" href="{% url 'TakeTest' a.id %}">
+      <div><strong>{{ a.test.title }}</strong><div class="meta"><span>Started {{ a.started_at|date:"d M, H:i" }}</span></div></div>
+      <span class="badge warn">Resume</span>
+    </a>
+    {% empty %}<p class="empty">Nothing in progress.</p>{% endfor %}
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2>Recent results</h2><a href="{% url 'CompletedTests' %}">View all</a></div>
+    {% for a in recent_completed_tests %}
+    <a class="row" href="{% url 'TestResult' a.id %}">
+      <div><strong>{{ a.test.title }}</strong><div class="meta"><span>{{ a.submitted_at|date:"d M Y" }}</span></div></div>
+      <span class="badge ok">{{ a.marks_obtained }} / {{ a.test.total_marks }}</span>
+    </a>
+    {% empty %}<p class="empty">No completed tests yet.</p>{% endfor %}
+  </section>
+</div>
+{% endblock %}

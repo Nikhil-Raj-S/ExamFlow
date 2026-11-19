@@ -20,6 +20,7 @@ urlpatterns = [
     path('student/attempts/<int:attempt_id>/submit/', views.submit_test, name='SubmitTest'),
     path('student/attempts/<int:attempt_id>/result/', views.test_result, name='TestResult'),
 
+    path('teacher/dashboard/', views.teacher_dashboard, name='TeacherDashboard'),
     path('teacher/tests/create/', views.create_test, name='CreateTest'),
     path('teacher/tests/', views.teacher_test_list, name='TeacherTestList'),
     path('teacher/tests/<int:test_id>/', views.teacher_test_detail, name='TeacherTestDetail'),

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Result: {{ test.title }}{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div><h1>{{ test.title }}</h1><p class="sub">{{ test.subject }}, attempt #{{ attempt.attempt_no }}</p></div>
+  <div class="actions"><a class="btn" href="{% url 'CompletedTests' %}">All results</a><a class="btn btn-primary" href="{% url 'AvailableTests' %}">Find another test</a></div>
+</header>
+<section class="card score">
+  <div class="ring" style="--pct: {{ percentage|stringformat:'.0f' }}"><span>{{ percentage|floatformat:"-1" }}%</span></div>
+  <div>
+    <div class="score-big">{{ attempt.marks_obtained }} <span class="muted" style="font-size:1.3rem">/ {{ total_marks }}</span></div>
+    <p class="muted" style="margin-top:.5rem">Submitted {{ attempt.submitted_at|date:"d M Y, H:i" }}</p>
+  </div>
+</section>
+{% endblock %}

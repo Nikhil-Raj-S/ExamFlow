@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Completed tests{% endblock %}
+{% block content %}
+<header class="page-head"><div><h1>Completed tests</h1><p class="sub">Your submitted attempts and scores.</p></div></header>
+{% include "_filters.html" %}
+<div class="card table-wrap">
+  <table class="table">
+    <thead><tr><th>Test</th><th>Subject</th><th>Attempt</th><th>Submitted</th><th>Score</th><th></th></tr></thead>
+    <tbody>
+    {% for a in attempts %}
+      <tr><td><strong>{{ a.test.title }}</strong></td><td>{{ a.test.subject }}</td><td>#{{ a.attempt_no }}</td><td>{{ a.submitted_at|date:"d M Y, H:i" }}</td>
+          <td><span class="badge ok">{{ a.marks_obtained }} / {{ a.test.total_marks }}</span></td>
+          <td class="num"><a class="btn btn-sm" href="{% url 'TestResult' a.id %}">View result</a></td></tr>
+    {% empty %}<tr><td colspan="6" class="empty">No completed tests yet.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

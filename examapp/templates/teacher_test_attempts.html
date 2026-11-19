@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Attempts: {{ test.title }}{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div><h1>Attempts</h1><p class="sub">{{ test.title }}</p></div>
+  <div class="actions"><a class="btn" href="{% url 'TeacherTestDetail' test.id %}">Back to test</a><a class="btn" href="{% url 'TeacherTestPerformance' test.id %}">Performance</a></div>
+</header>
+<div class="card table-wrap">
+  <table class="table">
+    <thead><tr><th>Student</th><th>Attempt</th><th>Status</th><th>Marks</th><th>Started</th><th>Submitted</th><th></th></tr></thead>
+    <tbody>
+    {% for a in attempts %}
+      <tr>
+        <td><strong>{{ a.student.username }}</strong></td><td>#{{ a.attempt_no }}</td>
+        <td>{% if a.status == 'completed' %}<span class="badge ok">Completed</span>{% else %}<span class="badge warn">In progress</span>{% endif %}</td>
+        <td>{% if a.status == 'completed' %}{{ a.marks_obtained }} / {{ test.total_marks }}{% else %}-{% endif %}</td>
+        <td>{{ a.started_at|date:"d M Y, H:i" }}</td><td>{{ a.submitted_at|date:"d M Y, H:i"|default:"-" }}</td>
+        <td class="num"><a class="btn btn-sm" href="{% url 'TeacherAttemptDetail' a.id %}">Review</a></td>
+      </tr>
+    {% empty %}<tr><td colspan="7" class="empty">No one has attempted this test yet.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

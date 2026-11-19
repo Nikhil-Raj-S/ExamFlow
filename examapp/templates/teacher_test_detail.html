@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{{ test.title }}{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <h1>{{ test.title }}</h1>
+    <p class="sub">{{ test.subject }} {% if test.is_published %}<span class="badge ok">Published</span>{% else %}<span class="badge plain">Draft</span>{% endif %}</p>
+  </div>
+  <div class="actions">
+    <a class="btn" href="{% url 'TeacherTestAttempts' test.id %}">Attempts</a>
+    <a class="btn" href="{% url 'TeacherTestPerformance' test.id %}">Performance</a>
+    {% if not test.is_published %}
+      <a class="btn" href="{% url 'EditTest' test.id %}">Edit test</a>
+      <form class="inline" method="post" action="{% url 'PublishTest' test.id %}" onsubmit="return confirm('Publish this test? You cannot edit it afterwards.')">{% csrf_token %}<button class="btn btn-primary" type="submit">Publish</button></form>
+      <form class="inline" method="post" action="{% url 'DeleteTest' test.id %}" onsubmit="return confirm('Delete this test and all its questions?')">{% csrf_token %}<button class="btn btn-danger" type="submit">Delete</button></form>
+    {% endif %}
+  </div>
+</header>
+
+<div class="stack">
+  <section class="card">
+    <dl class="facts">
+      <dt>Opens</dt><dd>{{ test.start_time|date:"d M Y, H:i"|default:"Not set" }}</dd>
+      <dt>Closes</dt><dd>{{ test.last_date_for_submission|date:"d M Y" }}</dd>
+      <dt>Duration</dt><dd>{{ test.duration_minutes }} minutes</dd>
+      <dt>Total marks</dt><dd>{{ test.total_marks }}</dd>
+    </dl>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h2>Questions ({{ questions|length }})</h2>
+      {% if not test.is_published %}<a class="btn btn-primary btn-sm" href="{% url 'CreateQuestion' test.id %}">Add question</a>{% endif %}
+    </div>
+    {% for q in questions %}
+    <div class="q-item">
+      <div class="q-top">
+        <div><span class="q-no">Question {{ forloop.counter }}</span><p style="margin-top:.2rem">{{ q.question_text|linebreaksbr }}</p></div>
+        {% if not test.is_published %}
+        <div class="actions">
+          <a class="btn btn-sm" href="{% url 'EditQuestion' q.id %}">Edit</a>
+          <form class="inline" method="post" action="{% url 'DeleteQuestion' q.id %}" onsubmit="return confirm('Delete this question?')">{% csrf_token %}<button class="btn btn-danger btn-sm" type="submit">Delete</button></form>
+        </div>
+        {% endif %}
+      </div>
+      <ul class="q-opts">
+        <li class="{% if q.correct_option == 'A' %}right{% endif %}"><span class="k">A</span>{{ q.option_a }}{% if q.correct_option == 'A' %}<span class="tag">Correct</span>{% endif %}</li>
+        <li class="{% if q.correct_option == 'B' %}right{% endif %}"><span class="k">B</span>{{ q.option_b }}{% if q.correct_option == 'B' %}<span class="tag">Correct</span>{% endif %}</li>
+        <li class="{% if q.correct_option == 'C' %}right{% endif %}"><span class="k">C</span>{{ q.option_c }}{% if q.correct_option == 'C' %}<span class="tag">Correct</span>{% endif %}</li>
+        <li class="{% if q.correct_option == 'D' %}right{% endif %}"><span class="k">D</span>{{ q.option_d }}{% if q.correct_option == 'D' %}<span class="tag">Correct</span>{% endif %}</li>
+      </ul>
+    </div>
+    {% empty %}
+    <p class="empty">No questions yet.{% if not test.is_published %} Add at least one to publish.{% endif %}</p>
+    {% endfor %}
+  </section>
+</div>
+{% endblock %}

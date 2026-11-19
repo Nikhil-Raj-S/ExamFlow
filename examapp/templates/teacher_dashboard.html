@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div><h1>Hello, {{ user.first_name|default:user.username }}</h1><p class="sub">A look at your tests and how students are doing.</p></div>
+  <div class="actions"><a class="btn btn-primary" href="{% url 'CreateTest' %}">Create test</a></div>
+</header>
+<section class="stats">
+  <a class="stat" href="{% url 'TeacherTestList' %}"><span class="stat-n">{{ total_tests }}</span><span class="stat-l">Tests</span></a>
+  <div class="stat"><span class="stat-n">{{ published_tests }}</span><span class="stat-l">Published</span></div>
+  <div class="stat"><span class="stat-n">{{ draft_tests }}</span><span class="stat-l">Drafts</span></div>
+  <div class="stat"><span class="stat-n">{{ total_attempts }}</span><span class="stat-l">Attempts</span></div>
+  <div class="stat"><span class="stat-n">{{ completed_attempts }}</span><span class="stat-l">Completed</span></div>
+  <div class="stat"><span class="stat-n">{{ in_progress_attempts }}</span><span class="stat-l">In progress</span></div>
+</section>
+<section class="card">
+  <div class="card-head"><h2>Recent tests</h2><a href="{% url 'TeacherTestList' %}">View all</a></div>
+  {% for t in recent_tests %}
+  <a class="row" href="{% url 'TeacherTestDetail' t.id %}">
+    <div><strong>{{ t.title }}</strong><div class="meta"><span>{{ t.subject }}</span><span>Created {{ t.created_at|date:"d M Y" }}</span></div></div>
+    {% if t.is_published %}<span class="badge ok">Published</span>{% else %}<span class="badge plain">Draft</span>{% endif %}
+  </a>
+  {% empty %}<p class="empty">You have not created any tests yet. <a href="{% url 'CreateTest' %}">Create your first test</a>.</p>{% endfor %}
+</section>
+{% endblock %}

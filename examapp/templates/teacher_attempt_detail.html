@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ attempt.student.username }}: {{ attempt.test.title }}{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div><h1>{{ attempt.student.username }}</h1><p class="sub">{{ attempt.test.title }}, attempt #{{ attempt.attempt_no }}</p></div>
+  <div class="actions"><a class="btn" href="{% url 'TeacherTestAttempts' attempt.test.id %}">All attempts</a></div>
+</header>
+<section class="stats">
+  <div class="stat"><span class="stat-n">{{ attempt.marks_obtained }} / {{ attempt.test.total_marks }}</span><span class="stat-l">Marks</span></div>
+  <div class="stat"><span class="stat-n" style="font-size:1.2rem;padding-top:.5rem">{% if attempt.status == 'completed' %}Completed{% else %}In progress{% endif %}</span><span class="stat-l">Status</span></div>
+  <div class="stat"><span class="stat-n" style="font-size:1.2rem;padding-top:.5rem">{{ attempt.submitted_at|date:"d M, H:i"|default:"-" }}</span><span class="stat-l">Submitted</span></div>
+</section>
+<section class="card">
+  <h2 style="margin-bottom:.5rem">Answers</h2>
+  {% for ans in answers %}
+  <div class="q-item">
+    <div class="q-top">
+      <div><span class="q-no">Question {{ forloop.counter }}</span><p style="margin-top:.2rem">{{ ans.question.question_text|linebreaksbr }}</p></div>
+      {% if ans.marks_obtained %}<span class="badge ok">Correct</span>{% else %}<span class="badge bad">Wrong</span>{% endif %}
+    </div>
+    <ul class="q-opts">
+      <li class="{% if ans.question.correct_option == 'A' %}right{% elif ans.selected_option == 'A' %}wrong{% endif %}"><span class="k">A</span>{{ ans.question.option_a }}<span class="tag">{% if ans.selected_option == 'A' %}Student's answer{% endif %}{% if ans.question.correct_option == 'A' %}{% if ans.selected_option == 'A' %}, {% endif %}Correct{% endif %}</span></li>
+      <li class="{% if ans.question.correct_option == 'B' %}right{% elif ans.selected_option == 'B' %}wrong{% endif %}"><span class="k">B</span>{{ ans.question.option_b }}<span class="tag">{% if ans.selected_option == 'B' %}Student's answer{% endif %}{% if ans.question.correct_option == 'B' %}{% if ans.selected_option == 'B' %}, {% endif %}Correct{% endif %}</span></li>
+      <li class="{% if ans.question.correct_option == 'C' %}right{% elif ans.selected_option == 'C' %}wrong{% endif %}"><span class="k">C</span>{{ ans.question.option_c }}<span class="tag">{% if ans.selected_option == 'C' %}Student's answer{% endif %}{% if ans.question.correct_option == 'C' %}{% if ans.selected_option == 'C' %}, {% endif %}Correct{% endif %}</span></li>
+      <li class="{% if ans.question.correct_option == 'D' %}right{% elif ans.selected_option == 'D' %}wrong{% endif %}"><span class="k">D</span>{{ ans.question.option_d }}<span class="tag">{% if ans.selected_option == 'D' %}Student's answer{% endif %}{% if ans.question.correct_option == 'D' %}{% if ans.selected_option == 'D' %}, {% endif %}Correct{% endif %}</span></li>
+    </ul>
+  </div>
+  {% empty %}<p class="empty">No answers were saved for this attempt.</p>{% endfor %}
+</section>
+{% endblock %}

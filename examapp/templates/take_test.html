@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}{{ test.title }}{% endblock %}
+{% block shell %}
+<div class="exam-bar">
+  <div class="title"><strong>{{ test.title }}</strong> <span class="muted">{{ test.subject }}</span></div>
+  <span class="save-state" id="saveState" aria-live="polite"></span>
+  <div class="timer" id="timer" role="timer" data-seconds="{{ remaining_seconds }}">--:--</div>
+  <button class="btn btn-primary" type="button" id="submitBtn">Submit test</button>
+</div>
+
+<div class="exam-layout">
+  <div>
+    {% for q in questions %}
+    <section class="q-card" id="q{{ q.id }}" data-question="{{ q.id }}">
+      <span class="q-no">Question {{ forloop.counter }}</span>
+      <p class="q-text">{{ q.question_text|linebreaksbr }}</p>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q{{ q.id }}" value="A" {% if q.selected == 'A' %}checked{% endif %}><span class="opt-key">A</span><span>{{ q.option_a }}</span></label>
+        <label class="opt"><input type="radio" name="q{{ q.id }}" value="B" {% if q.selected == 'B' %}checked{% endif %}><span class="opt-key">B</span><span>{{ q.option_b }}</span></label>
+        <label class="opt"><input type="radio" name="q{{ q.id }}" value="C" {% if q.selected == 'C' %}checked{% endif %}><span class="opt-key">C</span><span>{{ q.option_c }}</span></label>
+        <label class="opt"><input type="radio" name="q{{ q.id }}" value="D" {% if q.selected == 'D' %}checked{% endif %}><span class="opt-key">D</span><span>{{ q.option_d }}</span></label>
+      </div>
+    </section>
+    {% empty %}
+    <p class="empty">This test has no questions.</p>
+    {% endfor %}
+  </div>
+  <aside class="exam-side card">
+    <h2>Questions</h2>
+    <div class="qnav">
+      {% for q in questions %}<a href="#q{{ q.id }}" data-nav="{{ q.id }}">{{ forloop.counter }}</a>{% endfor %}
+    </div>
+    <p class="muted" style="margin-top:.8rem;font-size:.88rem">Filled squares are answered.</p>
+  </aside>
+</div>
+
+<form id="submitForm" method="post" action="{% url 'SubmitTest' attempt.id %}">{% csrf_token %}</form>
+
+<dialog id="confirm">
+  <h2>Submit your test?</h2>
+  <p id="confirmText"></p>
+  <div class="actions">
+    <button class="btn btn-primary" type="button" id="confirmYes">Submit test</button>
+    <button class="btn" type="button" id="confirmNo">Keep working</button>
+  </div>
+</dialog>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  const form = document.getElementById('submitForm');
+  const token = form.querySelector('[name=csrfmiddlewaretoken]').value;
+  const saveUrl = "{% url 'SaveAnswer' attempt.id %}";
+  const stateEl = document.getElementById('saveState');
+  const timerEl = document.getElementById('timer');
+  const dialog = document.getElementById('confirm');
+  let submitting = false;
+
+  function submitNow() { if (!submitting) { submitting = true; form.submit(); } }
+
+  // Timer: based on the server's remaining seconds, checked against the clock.
+  const endAt = Date.now() + parseInt(timerEl.dataset.seconds, 10) * 1000;
+  const pad = n => String(n).padStart(2, '0');
+  function tick() {
+    const left = Math.max(0, Math.round((endAt - Date.now()) / 1000));
+    const h = Math.floor(left / 3600), m = Math.floor(left % 3600 / 60), s = left % 60;
+    timerEl.textContent = (h ? h + ':' : '') + pad(m) + ':' + pad(s);
+    timerEl.classList.toggle('low', left <= 300);
+    if (left === 0) submitNow();
+  }
+  tick(); setInterval(tick, 1000);
+
+  // Navigator
+  function markDone(qid) { const n = document.querySelector('[data-nav="' + qid + '"]'); if (n) n.classList.add('done'); }
+  document.querySelectorAll('.q-card').forEach(c => { if (c.querySelector('input:checked')) markDone(c.dataset.question); });
+  const answered = () => document.querySelectorAll('.qnav a.done').length;
+  const total = () => document.querySelectorAll('.q-card').length;
+
+  // Autosave
+  document.querySelectorAll('.q-card input[type=radio]').forEach(inp => {
+    inp.addEventListener('change', async () => {
+      const qid = inp.closest('.q-card').dataset.question;
+      stateEl.textContent = 'Saving...';
+      try {
+        const r = await fetch(saveUrl, {
+          method: 'POST',
+          headers: { 'X-CSRFToken': token, 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ question_id: qid, selected_option: inp.value })
+        });
+        if (r.ok) { stateEl.textContent = 'Saved'; markDone(qid); }
+        else if (r.status === 403) { location.reload(); }
+        else { stateEl.textContent = 'Not saved. Pick again.'; }
+      } catch (e) { stateEl.textContent = 'Offline. Not saved.'; }
+    });
+  });
+
+  // Submit confirmation
+  document.getElementById('submitBtn').addEventListener('click', () => {
+    const left = total() - answered();
+    document.getElementById('confirmText').textContent = left
+      ? 'You have ' + left + ' unanswered question' + (left === 1 ? '' : 's') + '. You cannot change answers after submitting.'
+      : 'All questions are answered. You cannot change answers after submitting.';
+    dialog.showModal();
+  });
+  document.getElementById('confirmNo').addEventListener('click', () => dialog.close());
+  document.getElementById('confirmYes').addEventListener('click', submitNow);
+})();
+</script>
+{% endblock %}

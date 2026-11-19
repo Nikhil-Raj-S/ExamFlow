@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ test.title }}{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div><h1>{{ test.title }}</h1><p class="sub">{{ test.subject }}</p></div>
+  <div class="actions"><a class="btn" href="{% url 'AvailableTests' %}">Back to tests</a></div>
+</header>
+<div class="two-col">
+  <section class="card">
+    <h2 style="margin-bottom:1rem">Test details</h2>
+    <dl class="facts">
+      <dt>Duration</dt><dd>{{ test.duration_minutes }} minutes</dd>
+      <dt>Total marks</dt><dd>{{ test.total_marks }}</dd>
+      <dt>Opens</dt><dd>{{ test.start_time|date:"d M Y, H:i" }}</dd>
+      <dt>Closes</dt><dd>{{ test.last_date_for_submission|date:"d M Y" }}</dd>
+    </dl>
+  </section>
+  <section class="card">
+    <h2 style="margin-bottom:.8rem">Before you begin</h2>
+    <p class="muted" style="margin-bottom:1.2rem">The timer starts as soon as you begin and keeps running if you leave the page. Answers save as you pick them, and the test submits itself when time is up.</p>
+    {% if active_attempt %}
+      <a class="btn btn-primary" href="{% url 'TakeTest' active_attempt.id %}">Resume attempt</a>
+    {% elif can_start %}
+      <form method="post" action="{% url 'StartTest' test.id %}">{% csrf_token %}<button class="btn btn-primary" type="submit">Start test</button></form>
+    {% else %}
+      <span class="badge bad">Not open right now</span>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Performance: {{ test.title }}{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div><h1>Performance</h1><p class="sub">{{ test.title }}</p></div>
+  <div class="actions"><a class="btn" href="{% url 'TeacherTestDetail' test.id %}">Back to test</a><a class="btn" href="{% url 'TeacherTestAttempts' test.id %}">View attempts</a></div>
+</header>
+<section class="stats">
+  <div class="stat"><span class="stat-n">{{ total_attempts }}</span><span class="stat-l">Total attempts</span></div>
+  <div class="stat"><span class="stat-n">{{ completed_count }}</span><span class="stat-l">Completed</span></div>
+  <div class="stat"><span class="stat-n">{{ in_progress_count }}</span><span class="stat-l">In progress</span></div>
+  <div class="stat"><span class="stat-n">{{ average_marks|floatformat:1 }}</span><span class="stat-l">Average marks, out of {{ test.total_marks }}</span></div>
+  <div class="stat"><span class="stat-n">{{ highest_marks }}</span><span class="stat-l">Highest marks</span></div>
+</section>
+{% if completed_count == 0 %}<p class="muted">Averages appear once students complete the test.</p>{% endif %}
+{% endblock %}

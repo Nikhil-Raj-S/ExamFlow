@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Create test{% endblock %}
+{% block content %}
+<header class="page-head"><div><h1>Create test</h1><p class="sub">Set the details now. You add questions next, then publish.</p></div></header>
+<form class="card form-card" method="post" novalidate>
+  {% csrf_token %}
+  {% include "_form_fields.html" %}
+  <div class="form-actions"><button class="btn btn-primary" type="submit">Create test</button><a class="btn" href="{% url 'TeacherTestList' %}">Cancel</a></div>
+</form>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Available tests{% endblock %}
+{% block content %}
+<header class="page-head"><div><h1>Available tests</h1><p class="sub">Tests you can start right now.</p></div></header>
+{% include "_filters.html" %}
+<div class="cards">
+  {% for test in tests %}
+  <article class="card test-card">
+    <div><h2>{{ test.title }}</h2><div class="muted">{{ test.subject }} by {{ test.teacher.username }}</div></div>
+    <div class="meta"><span>{{ test.duration_minutes }} min</span><span>{{ test.total_marks }} marks</span><span>Closes {{ test.last_date_for_submission|date:"d M Y" }}</span></div>
+    <div class="foot"><a class="btn btn-primary" href="{% url 'TestDetail' test.id %}">View test</a></div>
+  </article>
+  {% empty %}
+  <p class="empty" style="grid-column:1/-1">No tests match. Check back later or clear the filters.</p>
+  {% endfor %}
+</div>
+{% endblock %}
