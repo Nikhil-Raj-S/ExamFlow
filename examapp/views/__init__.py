@@ -2,7 +2,7 @@ from .auth import user_login, user_logout
 
 from .dashboard import student_dashboard, teacher_dashboard
 
-from .profile import student_profile, teacher_profile
+from .profile import student_profile, teacher_profile, edit_profile
 
 from .test_lists import available_tests, in_progress_tests, completed_tests
 

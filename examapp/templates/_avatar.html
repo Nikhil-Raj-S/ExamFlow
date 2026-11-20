@@ -1,0 +1,3 @@
+<div class="avatar {{ size|default:'md' }}">
+  {% if profile.profile_picture %}<img src="{{ profile.profile_picture.url }}" alt="{{ profile.user.username }}'s photo">{% else %}<span aria-hidden="true">{{ profile.user.username|first|upper }}</span>{% endif %}
+</div>

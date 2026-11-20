@@ -130,3 +130,6 @@ MAILERS = {
     },
 }
 LOGIN_URL = 'Login'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

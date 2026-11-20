@@ -1,14 +1,90 @@
 {% extends "base.html" %}
-{% block title %}Profile{% endblock %}
+{% block title %}My profile{% endblock %}
 {% block content %}
-<header class="page-head"><div><h1>Profile</h1></div></header>
-<section class="card form-card">
-  <dl class="facts">
-    <dt>Username</dt><dd>{{ user.username }}</dd>
-    <dt>Name</dt><dd>{{ user.get_full_name|default:"Not set" }}</dd>
-    <dt>Email</dt><dd>{{ user.email|default:"Not set" }}</dd>
-    <dt>Role</dt><dd>{{ profile.get_role_display }}</dd>
-    <dt>Joined</dt><dd>{{ user.date_joined|date:"d M Y" }}</dd>
-  </dl>
+{% with d=profile.learner_details %}
+
+<section class="card pf-hero">
+  <div class="pf-cover"></div>
+  <div class="pf-head">
+    {% include "_avatar.html" with profile=profile size="xl" %}
+    <div class="pf-id">
+      <h1 class="pf-name">{{ profile.user.get_full_name|default:profile.user.username }}</h1>
+      {% if profile.headline %}<p class="pf-headline">{{ profile.headline }}</p>{% endif %}
+      <div class="meta">
+        <span class="badge">Student</span>
+        {% if profile.city or profile.country %}<span>{{ profile.city }}{% if profile.city and profile.country %}, {% endif %}{{ profile.country }}</span>{% endif %}
+        <span>Member since {{ profile.created_at|date:"M Y" }}</span>
+      </div>
+    </div>
+    <a class="btn btn-primary pf-edit" href="{% url 'EditProfile' %}">Edit profile</a>
+  </div>
 </section>
+
+<div class="pf-layout">
+  <div class="pf-main">
+
+    {% if profile.bio %}
+    <section class="card pf-sec"><h2>About</h2><p class="pf-text">{{ profile.bio|linebreaksbr }}</p></section>
+    {% endif %}
+
+    {% if d.highest_education or d.institution or d.field_of_study or d.current_occupation %}
+    <section class="card pf-sec">
+      <h2>Education</h2>
+      <dl class="facts">
+        {% if d.highest_education %}<dt>Highest education</dt><dd>{{ d.highest_education }}</dd>{% endif %}
+        {% if d.institution %}<dt>Institution</dt><dd>{{ d.institution }}</dd>{% endif %}
+        {% if d.field_of_study %}<dt>Field of study</dt><dd>{{ d.field_of_study }}</dd>{% endif %}
+        {% if d.current_occupation %}<dt>Current occupation</dt><dd>{{ d.current_occupation }}</dd>{% endif %}
+      </dl>
+    </section>
+    {% endif %}
+
+    {% if d.skills or d.interests %}
+    <section class="card pf-sec">
+      <h2>Skills and interests</h2>
+      {% if d.skills %}<div class="pf-block"><div class="pf-label">Skills</div><p class="pf-text">{{ d.skills|linebreaksbr }}</p></div>{% endif %}
+      {% if d.interests %}<div class="pf-block"><div class="pf-label">Interests</div><p class="pf-text">{{ d.interests|linebreaksbr }}</p></div>{% endif %}
+    </section>
+    {% endif %}
+
+    {% if d.learning_goals or d.career_goals %}
+    <div class="pf-duo">
+      {% if d.learning_goals %}<section class="card pf-sec"><h2>Learning goals</h2><p class="pf-text">{{ d.learning_goals|linebreaksbr }}</p></section>{% endif %}
+      {% if d.career_goals %}<section class="card pf-sec"><h2>Career goals</h2><p class="pf-text">{{ d.career_goals|linebreaksbr }}</p></section>{% endif %}
+    </div>
+    {% endif %}
+
+    {% if not d.highest_education and not d.institution and not d.field_of_study and not d.current_occupation and not d.skills and not d.interests and not d.learning_goals and not d.career_goals %}
+    <section class="card pf-empty">
+      <h2>Show what you are learning</h2>
+      <p class="muted">Add your education, skills and goals so your profile tells your story.</p>
+      <a class="btn btn-primary" href="{% url 'EditProfile' %}">Complete your profile</a>
+    </section>
+    {% endif %}
+  </div>
+
+  <div class="pf-side">
+    {% if profile.user.email or profile.phone_number or profile.date_of_birth %}
+    <section class="card pf-sec">
+      <h2>Personal information</h2>
+      <dl class="facts">
+        {% if profile.user.email %}<dt>Email</dt><dd>{{ profile.user.email }}</dd>{% endif %}
+        {% if profile.phone_number %}<dt>Phone</dt><dd>{{ profile.phone_number }}</dd>{% endif %}
+        {% if profile.date_of_birth %}<dt>Born</dt><dd>{{ profile.date_of_birth|date:"d M Y" }}</dd><dt>Age</dt><dd>{{ profile.age }}</dd>{% endif %}
+      </dl>
+    </section>
+    {% endif %}
+
+    {% if profile.linkedin_url or profile.website_url %}
+    <section class="card pf-sec">
+      <h2>Links</h2>
+      <div class="pf-links">
+        {% if profile.linkedin_url %}<a class="pf-link" href="{{ profile.linkedin_url }}" target="_blank" rel="noopener noreferrer"><span class="pf-link-l">LinkedIn</span><span class="pf-link-u">{{ profile.linkedin_url|truncatechars:34 }}</span></a>{% endif %}
+        {% if profile.website_url %}<a class="pf-link" href="{{ profile.website_url }}" target="_blank" rel="noopener noreferrer"><span class="pf-link-l">Website</span><span class="pf-link-u">{{ profile.website_url|truncatechars:34 }}</span></a>{% endif %}
+      </div>
+    </section>
+    {% endif %}
+  </div>
+</div>
+{% endwith %}
 {% endblock %}

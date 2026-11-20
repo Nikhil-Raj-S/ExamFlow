@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Edit profile{% endblock %}
+{% block content %}
+<header class="page-head"><div><h1>Edit profile</h1><p class="sub">Keep your details current. Everything except your photo is optional.</p></div></header>
+
+<form method="post" enctype="multipart/form-data" novalidate>
+  {% csrf_token %}
+
+  {% if profile_form.errors or role_form.errors %}
+    <div class="msg error" style="margin-bottom:1rem" role="alert">Some fields need your attention. They are marked below.{{ profile_form.non_field_errors }}{{ role_form.non_field_errors }}</div>
+  {% endif %}
+
+  <div class="ed-layout">
+    <nav class="ed-nav card" aria-label="Profile sections">
+      <a href="#photo">Photo</a>
+      <a href="#basic">Basic information</a>
+      <a href="#links">Links</a>
+      <a href="#role-a">{% if profile.role == 'teacher' %}Professional details{% else %}Education{% endif %}</a>
+      <a href="#role-b">{% if profile.role == 'teacher' %}Expertise and experience{% else %}Skills and goals{% endif %}</a>
+    </nav>
+
+    <div class="stack">
+
+      <section class="card" id="photo">
+        <h2 class="sec-title">Photo</h2>
+        <div class="photo-row">
+          <div class="avatar lg" id="avatarBox">
+            {% if profile.profile_picture %}<img src="{{ profile.profile_picture.url }}" alt="Current photo">{% else %}<span aria-hidden="true">{{ profile.user.username|first|upper }}</span>{% endif %}
+          </div>
+          <div class="photo-controls">
+            <label class="btn btn-sm" for="id_profile_picture">Choose photo</label>
+            <input class="file-hidden" type="file" name="profile_picture" id="id_profile_picture" accept="image/*">
+            <span class="muted" id="fileName">JPG or PNG. A square image looks best.</span>
+            {% if profile.profile_picture %}<label class="check"><input type="checkbox" name="profile_picture-clear" id="profile_picture-clear"> Remove current photo</label>{% endif %}
+            {% for e in profile_form.profile_picture.errors %}<div class="err">{{ e }}</div>{% endfor %}
+          </div>
+        </div>
+      </section>
+
+      
+      <section class="card" id="basic">
+          <h2 class="sec-title">Basic information</h2>
+          <div class="form-grid">
+
+              {% include "_field.html" with field=profile_form.email %}
+
+              {% for field in profile_form %}
+                  {% if field.name != 'email' and field.name != 'profile_picture' and field.name != 'linkedin_url' and field.name != 'website_url' %}
+                      {% include "_field.html" with field=field %}
+                  {% endif %}
+              {% endfor %}
+
+          </div>
+      </section>
+
+
+      <section class="card" id="links">
+        <h2 class="sec-title">Links</h2>
+        <div class="form-grid">
+          {% for field in profile_form %}{% if field.name == 'linkedin_url' or field.name == 'website_url' %}
+            {% include "_field.html" with field=field %}
+          {% endif %}{% endfor %}
+        </div>
+      </section>
+
+      <section class="card" id="role-a">
+        <h2 class="sec-title">{% if profile.role == 'teacher' %}Professional details{% else %}Education{% endif %}</h2>
+        <div class="form-grid">
+          {% for field in role_form %}{% if field.widget_type != 'textarea' %}
+            {% include "_field.html" with field=field %}
+          {% endif %}{% endfor %}
+        </div>
+      </section>
+
+      <section class="card" id="role-b">
+        <h2 class="sec-title">{% if profile.role == 'teacher' %}Expertise and experience{% else %}Skills and goals{% endif %}</h2>
+        <div class="form-grid">
+          {% for field in role_form %}{% if field.widget_type == 'textarea' %}
+            {% include "_field.html" with field=field %}
+          {% endif %}{% endfor %}
+        </div>
+      </section>
+
+      <div class="form-actions sticky-actions">
+        <button class="btn btn-primary" type="submit">Save changes</button>
+        <a class="btn" href="{% if profile.role == 'teacher' %}{% url 'TeacherProfile' %}{% else %}{% url 'StudentProfile' %}{% endif %}">Cancel</a>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  const input = document.getElementById('id_profile_picture');
+  const box = document.getElementById('avatarBox');
+  const name = document.getElementById('fileName');
+  const clear = document.getElementById('profile_picture-clear');
+  input.addEventListener('change', () => {
+    const f = input.files[0];
+    if (!f) return;
+    name.textContent = f.name;
+    if (clear) clear.checked = false;
+    const img = document.createElement('img');
+    img.alt = 'Selected photo';
+    img.src = URL.createObjectURL(f);
+    box.replaceChildren(img);
+  });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}My profile{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div><h1>My profile</h1><p class="sub">This is how your details appear on ExamFlow.</p></div>
+  <div class="actions"><a class="btn btn-primary" href="{% url 'EditProfile' %}">Edit profile</a></div>
+</header>
+
+<div class="stack">
+  <section class="card profile-hero">
+    {% include "_avatar.html" with profile=profile size="lg" %}
+    <div class="hero-text">
+      <h2 class="hero-name">{{ profile.user.get_full_name|default:profile.user.username }}</h2>
+      {% if profile.headline %}<p class="hero-headline">{{ profile.headline }}</p>{% endif %}
+      <div class="meta">
+        <span class="badge">{{ profile.get_role_display }}</span>
+        {% if profile.city or profile.country %}<span>{{ profile.city }}{% if profile.city and profile.country %}, {% endif %}{{ profile.country }}</span>{% endif %}
+        <span>Joined {{ profile.created_at|date:"M Y" }}</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="two-col">
+    <section class="card wide">
+      <h2 class="sec-title">About</h2>
+      {% if profile.bio %}<p class="prose">{{ profile.bio|linebreaksbr }}</p>
+      {% else %}<p class="muted">No bio yet. <a href="{% url 'EditProfile' %}">Tell people a little about yourself</a>.</p>{% endif %}
+    </section>
+
+    <section class="card">
+      <h2 class="sec-title">Contact</h2>
+      <dl class="facts">
+        <dt>Username</dt><dd>{{ profile.user.username }}</dd>
+        <dt>Email</dt><dd>{% if profile.user.email %}{{ profile.user.email }}{% else %}<span class="muted">Not added</span>{% endif %}</dd>
+        {% include "_fact.html" with label="Phone" value=profile.phone_number %}
+        <dt>Date of birth</dt>
+        <dd>{% if profile.date_of_birth %}{{ profile.date_of_birth|date:"d M Y" }} <span class="muted">(age {{ profile.age }})</span>{% else %}<span class="muted">Not added</span>{% endif %}</dd>
+      </dl>
+    </section>
+
+    <section class="card">
+      <h2 class="sec-title">Links</h2>
+      <dl class="facts">
+        <dt>LinkedIn</dt><dd>{% if profile.linkedin_url %}<a href="{{ profile.linkedin_url }}" target="_blank" rel="noopener noreferrer">{{ profile.linkedin_url|truncatechars:38 }}</a>{% else %}<span class="muted">Not added</span>{% endif %}</dd>
+        <dt>Website</dt><dd>{% if profile.website_url %}<a href="{{ profile.website_url }}" target="_blank" rel="noopener noreferrer">{{ profile.website_url|truncatechars:38 }}</a>{% else %}<span class="muted">Not added</span>{% endif %}</dd>
+      </dl>
+    </section>
+
+    {% if role_profile %}
+      {% if profile.role == 'student' %}
+      <section class="card">
+        <h2 class="sec-title">Education</h2>
+        <dl class="facts">
+          {% include "_fact.html" with label="Highest education" value=role_profile.highest_education %}
+          {% include "_fact.html" with label="Institution" value=role_profile.institution %}
+          {% include "_fact.html" with label="Field of study" value=role_profile.field_of_study %}
+        </dl>
+      </section>
+      <section class="card">
+        <h2 class="sec-title">Learning and career</h2>
+        <dl class="facts">
+          {% include "_fact.html" with label="Occupation" value=role_profile.current_occupation %}
+          {% include "_fact.html" with label="Skills" value=role_profile.skills %}
+          {% include "_fact.html" with label="Interests" value=role_profile.interests %}
+          {% include "_fact.html" with label="Learning goals" value=role_profile.learning_goals %}
+          {% include "_fact.html" with label="Career goals" value=role_profile.career_goals %}
+        </dl>
+      </section>
+      {% else %}
+      <section class="card">
+        <h2 class="sec-title">Professional details</h2>
+        <dl class="facts">
+          {% include "_fact.html" with label="Qualification" value=role_profile.qualification %}
+          {% include "_fact.html" with label="Organization" value=role_profile.organization %}
+          {% include "_fact.html" with label="Designation" value=role_profile.designation %}
+          <dt>Experience</dt><dd>{% if role_profile.years_of_experience != None %}{{ role_profile.years_of_experience }} year{{ role_profile.years_of_experience|pluralize }}{% else %}<span class="muted">Not added</span>{% endif %}</dd>
+        </dl>
+      </section>
+      <section class="card">
+        <h2 class="sec-title">Expertise and teaching</h2>
+        <dl class="facts">
+          {% include "_fact.html" with label="Expertise" value=role_profile.expertise %}
+          {% include "_fact.html" with label="Certifications" value=role_profile.certifications %}
+          {% include "_fact.html" with label="Background" value=role_profile.professional_background %}
+          {% include "_fact.html" with label="Teaching experience" value=role_profile.teaching_experience %}
+        </dl>
+      </section>
+      {% endif %}
+    {% else %}
+      <section class="card wide">
+        <h2 class="sec-title">{% if profile.role == 'student' %}Education and goals{% else %}Professional details{% endif %}</h2>
+        <p class="muted">You have not filled this in yet. <a href="{% url 'EditProfile' %}">Complete your profile</a>.</p>
+      </section>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

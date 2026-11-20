@@ -20,17 +20,17 @@
         <a href="{% url 'TeacherDashboard' %}" class="{% if page == 'TeacherDashboard' %}on{% endif %}">Dashboard</a>
         <a href="{% url 'TeacherTestList' %}" class="{% if page == 'TeacherTestList' or page == 'TeacherTestDetail' or page == 'EditTest' or page == 'CreateQuestion' or page == 'EditQuestion' or page == 'TeacherTestAttempts' or page == 'TeacherAttemptDetail' or page == 'TeacherTestPerformance' %}on{% endif %}">My tests</a>
         <a href="{% url 'CreateTest' %}" class="{% if page == 'CreateTest' %}on{% endif %}">Create test</a>
-        <a href="{% url 'TeacherProfile' %}" class="{% if page == 'TeacherProfile' %}on{% endif %}">Profile</a>
+        <a href="{% url 'TeacherProfile' %}" class="{% if page == 'TeacherProfile' or page == 'EditProfile' %}on{% endif %}">Profile</a>
       {% else %}
         <a href="{% url 'StudentDashboard' %}" class="{% if page == 'StudentDashboard' %}on{% endif %}">Dashboard</a>
         <a href="{% url 'AvailableTests' %}" class="{% if page == 'AvailableTests' or page == 'TestDetail' %}on{% endif %}">Available tests</a>
         <a href="{% url 'InProgressTests' %}" class="{% if page == 'InProgressTests' %}on{% endif %}">In progress</a>
         <a href="{% url 'CompletedTests' %}" class="{% if page == 'CompletedTests' or page == 'TestResult' %}on{% endif %}">Completed</a>
-        <a href="{% url 'StudentProfile' %}" class="{% if page == 'StudentProfile' %}on{% endif %}">Profile</a>
+        <a href="{% url 'StudentProfile' %}" class="{% if page == 'StudentProfile' or page == 'EditProfile' %}on{% endif %}">Profile</a>
       {% endif %}
     </nav>
     <div class="rail-foot">
-      <div><div class="who">{{ user.username }}</div><div class="role">{{ role|capfirst }}</div></div>
+      <a class="who-link" href="{% if role == 'teacher' %}{% url 'TeacherProfile' %}{% else %}{% url 'StudentProfile' %}{% endif %}">{% include "_avatar.html" with profile=user.profile size="sm" %}<span><span class="who">{{ user.username }}</span><span class="role">{{ role|capfirst }}</span></span></a>
       <form method="post" action="{% url 'Logout' %}">{% csrf_token %}<button class="btn btn-sm" type="submit">Log out</button></form>
     </div>
   </aside>
