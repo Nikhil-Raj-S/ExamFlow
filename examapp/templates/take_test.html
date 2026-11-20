@@ -15,10 +15,10 @@
       <span class="q-no">Question {{ forloop.counter }}</span>
       <p class="q-text">{{ q.question_text|linebreaksbr }}</p>
       <div class="opts">
-        <label class="opt"><input type="radio" name="q{{ q.id }}" value="A" {% if q.selected == 'A' %}checked{% endif %}><span class="opt-key">A</span><span>{{ q.option_a }}</span></label>
-        <label class="opt"><input type="radio" name="q{{ q.id }}" value="B" {% if q.selected == 'B' %}checked{% endif %}><span class="opt-key">B</span><span>{{ q.option_b }}</span></label>
-        <label class="opt"><input type="radio" name="q{{ q.id }}" value="C" {% if q.selected == 'C' %}checked{% endif %}><span class="opt-key">C</span><span>{{ q.option_c }}</span></label>
-        <label class="opt"><input type="radio" name="q{{ q.id }}" value="D" {% if q.selected == 'D' %}checked{% endif %}><span class="opt-key">D</span><span>{{ q.option_d }}</span></label>
+        <label class="opt"><input type="radio" name="q{{ q.id }}" value="A" {% if q.selected_option == 'A' %}checked{% endif %}><span class="opt-key">A</span><span>{{ q.option_a }}</span></label>
+        <label class="opt"><input type="radio" name="q{{ q.id }}" value="B" {% if q.selected_option == 'B' %}checked{% endif %}><span class="opt-key">B</span><span>{{ q.option_b }}</span></label>
+        <label class="opt"><input type="radio" name="q{{ q.id }}" value="C" {% if q.selected_option == 'C' %}checked{% endif %}><span class="opt-key">C</span><span>{{ q.option_c }}</span></label>
+        <label class="opt"><input type="radio" name="q{{ q.id }}" value="D" {% if q.selected_option == 'D' %}checked{% endif %}><span class="opt-key">D</span><span>{{ q.option_d }}</span></label>
       </div>
     </section>
     {% empty %}

@@ -123,6 +123,16 @@ def take_test(request, attempt_id):
 
         questions = Question.objects.filter(test=attempt.test).order_by('id')
 
+        answers = AttemptAnswer.objects.filter(test_attempt=attempt)
+
+        saved_answers = {}
+
+        for answer in answers:
+            saved_answers[answer.question_id] = answer.selected_option
+
+        for question in questions:
+            question.selected_option = saved_answers.get(question.id)
+
         remaining_seconds = int((attempt_end_time(attempt) - now).total_seconds())
 
         context = {
@@ -134,7 +144,7 @@ def take_test(request, attempt_id):
 
     return render(request, 'take_test.html', context)
 
-
+    
 @student_required
 @require_POST
 def save_answer(request, attempt_id):
