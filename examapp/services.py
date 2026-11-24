@@ -1,9 +1,11 @@
 from datetime import timedelta
-
+import logging
 from django.db.models import Exists, OuterRef, Q
 from django.utils import timezone
 
 from .models import Test, TestAttempt, AttemptAnswer
+from django.conf import settings
+from django.core.mail import send_mail
 
 
 # ---------- Attempt timing ----------
@@ -96,3 +98,55 @@ def apply_search_filters(queryset, request, title_field, subject_field):
         queryset = queryset.filter(**{f'{subject_field}__iexact': subject})
 
     return queryset
+
+
+#------------sending email------------
+
+logger = logging.getLogger(__name__)
+
+def send_test_result_email(attempt_id):
+
+    try:
+        attempt = TestAttempt.objects.select_related(
+            'student', 'test'
+        ).get(id=attempt_id)
+
+        student_email = attempt.student.email
+
+        if not student_email:
+            logger.warning(
+                "No email address found for student %s",
+                attempt.student_id
+            )
+            return
+
+        subject = f"Your test result: {attempt.test.title}"
+
+        message = f"""
+                Hello {attempt.student.first_name or attempt.student.username},
+
+                Your test has been submitted successfully.
+
+                Test: {attempt.test.title}
+                Marks obtained: {attempt.marks_obtained}
+                Total marks: {attempt.test.total_marks}
+
+                Thank you for using ExamFlow.
+
+                Best regards,
+                ExamFlow Team
+                """
+
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[student_email],
+            fail_silently=False,
+        )
+
+    except Exception:
+        logger.exception(
+            "Failed to send result email for attempt %s",
+            attempt_id
+        )

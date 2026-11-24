@@ -16,6 +16,9 @@ env/
 db.sqlite3
 db.sqlite3-journal
 
+# Django collected static files
+staticfiles/
+
 # User uploaded files
 media/
 

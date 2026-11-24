@@ -12,6 +12,7 @@ from ..services import (
     finalize_attempt,
     finalize_expired_attempts,
     is_attempt_expired,
+    send_test_result_email,
 )
 
 
@@ -215,6 +216,12 @@ def submit_test(request, attempt_id):
             return HttpResponseForbidden('Invalid attempt.')
 
         finalize_attempt(attempt)
+
+        transaction.on_commit(
+            lambda: send_test_result_email(attempt.id),
+            robust=True
+        )
+
 
     return redirect('TestResult', attempt_id=attempt.id)
 
